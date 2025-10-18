@@ -196,7 +196,7 @@ class WeatherData {
       temperatureCelsius: json['temperature'].toDouble(),
       description: json['description'],
       humidity: json['humidity'],
-      windSpeed: json['windSpeed'].toDouble(),
+      windSpeed: json['windSpeed'],
       icon: json['icon'],
     );
   }
