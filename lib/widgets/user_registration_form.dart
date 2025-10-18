@@ -94,6 +94,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
+                key: const Key('name_field'),
                 controller: _nameController,
                 decoration: const InputDecoration(
                   labelText: 'Full Name',
@@ -112,6 +113,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
               buildValidationRow('At least 2 characters', hasValidName),
               const SizedBox(height: 16),
               TextFormField(
+                key: const Key('email_field'),
                 controller: _emailController,
                 decoration: const InputDecoration(
                   labelText: 'Email',
@@ -131,6 +133,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
               buildValidationRow('Valid email format', hasValidEmail),
               const SizedBox(height: 16),
               TextFormField(
+                key: const Key('password_field'),
                 controller: _passwordController,
                 decoration: const InputDecoration(
                   labelText: 'Password',
@@ -155,6 +158,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
 
               const SizedBox(height: 16),
               TextFormField(
+                key: const Key('confirm_password_field'),
                 controller: _confirmPasswordController,
                 decoration: const InputDecoration(
                   labelText: 'Confirm Password',

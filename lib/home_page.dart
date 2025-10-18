@@ -13,12 +13,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  int _currentIndex = 0;
+  int _currentIndex = 3;
 
   final List<Tab> _tabs = [
     const Tab(icon: Icon(Icons.person_add), text: 'Registration'),
     const Tab(icon: Icon(Icons.shopping_cart), text: 'Shopping Cart'),
-    const Tab(icon: Icon(Icons.wb_sunny), text: 'Weather'),
+    const Tab(
+      key: Key('weather'),
+      icon: Icon(Icons.wb_sunny), text: 'Weather'),
   ];
 
   final List<Widget> _tabViews = [
