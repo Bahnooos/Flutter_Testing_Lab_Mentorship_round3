@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_testing_lab/widgets/wheather_service.dart';
 
 class WeatherDisplay extends StatefulWidget {
   const WeatherDisplay({super.key});
@@ -8,67 +9,15 @@ class WeatherDisplay extends StatefulWidget {
 }
 
 class _WeatherDisplayState extends State<WeatherDisplay> {
-  WeatherData? _weatherData;
-  bool _isLoading = false;
-  String? _error;
+  WheatherService wheatherService = WheatherService();
   bool _useFahrenheit = false;
-  String _selectedCity = 'New York';
 
   final List<String> _cities = ['New York', 'London', 'Tokyo', 'Invalid City'];
-
-  double celsiusToFahrenheit(double celsius) {
-    return celsius * 9 / 5;
-  }
-
-  double fahrenheitToCelsius(double fahrenheit) {
-    return fahrenheit - 32 * 5 / 9;
-  }
-
-  // Simulate API call that sometimes returns null or malformed data
-  Future<Map<String, dynamic>?> _fetchWeatherData(String city) async {
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (city == 'Invalid City') {
-      return null;
-    }
-
-    
-    if (DateTime.now().millisecond % 4 == 0) {
-      return {'city': city, 'temperature': 22.5}; 
-    }
-
-    return {
-      'city': city,
-      'temperature': city == 'London' ? 15.0 : (city == 'Tokyo' ? 25.0 : 22.5),
-      'description': city == 'London'
-          ? 'Rainy'
-          : (city == 'Tokyo' ? 'Cloudy' : 'Sunny'),
-      'humidity': city == 'London' ? 85 : (city == 'Tokyo' ? 70 : 65),
-      'windSpeed': city == 'London' ? 8.5 : (city == 'Tokyo' ? 5.2 : 12.3),
-      'icon': city == 'London' ? '🌧️' : (city == 'Tokyo' ? '☁️' : '☀️'),
-    };
-  }
-
-  Future<void> _loadWeather() async {
-    if (mounted) {
-      setState(() {
-        _isLoading = true;
-        _error = null;
-      });
-    }
-
-    
-    final data = await _fetchWeatherData(_selectedCity);
-    setState(() {
-      _weatherData = WeatherData.fromJson(data); 
-      _isLoading = false;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    _loadWeather();
+    wheatherService.loadWeather();
   }
 
   @override
@@ -85,7 +34,7 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
               const SizedBox(width: 8),
               Expanded(
                 child: DropdownButton<String>(
-                  value: _selectedCity,
+                  value: wheatherService.selectedCity,
                   isExpanded: true,
                   items: _cities.map((city) {
                     return DropdownMenuItem(value: city, child: Text(city));
@@ -93,16 +42,18 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
                   onChanged: (value) {
                     if (value != null) {
                       setState(() {
-                        _selectedCity = value;
+                        wheatherService.selectedCity = value;
+                        wheatherService.loadWeather();
                       });
-                      _loadWeather();
                     }
                   },
                 ),
               ),
               const SizedBox(width: 8),
               ElevatedButton(
-                onPressed: _loadWeather,
+                onPressed: () => setState(() {
+                  wheatherService.loadWeather();
+                }),
                 child: const Text('Refresh'),
               ),
             ],
@@ -127,10 +78,9 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
           ),
           const SizedBox(height: 16),
 
-          if (_isLoading && _error == null)
+          if (wheatherService.isLoading)
             const Center(child: CircularProgressIndicator())
-          
-          else if (_weatherData != null)
+          else if (wheatherService.weatherData != null)
             Card(
               elevation: 4,
               child: Padding(
@@ -141,7 +91,7 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
                     Row(
                       children: [
                         Text(
-                          _weatherData!.icon,
+                          wheatherService.weatherData!.icon ?? '',
                           style: const TextStyle(fontSize: 48),
                         ),
                         const SizedBox(width: 16),
@@ -150,14 +100,14 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _weatherData!.city,
+                                wheatherService.weatherData!.city ?? '',
                                 style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Text(
-                                _weatherData!.description,
+                                wheatherService.weatherData!.description ?? '',
                                 style: const TextStyle(
                                   fontSize: 18,
                                   color: Colors.grey,
@@ -172,8 +122,8 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
                     Center(
                       child: Text(
                         _useFahrenheit
-                            ? '${celsiusToFahrenheit(_weatherData!.temperatureCelsius).toStringAsFixed(1)}°F'
-                            : '${_weatherData!.temperatureCelsius.toStringAsFixed(1)}°C',
+                            ? '${wheatherService.celsiusToFahrenheit(wheatherService.weatherData!.temperatureCelsius ?? 0).toStringAsFixed(1)}°F'
+                            : '${wheatherService.weatherData!.temperatureCelsius?.toStringAsFixed(1)}°C',
                         style: const TextStyle(
                           fontSize: 48,
                           fontWeight: FontWeight.bold,
@@ -186,12 +136,12 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
                       children: [
                         _buildWeatherDetail(
                           'Humidity',
-                          '${_weatherData!.humidity}%',
+                          '${wheatherService.weatherData!.humidity}%',
                           Icons.water_drop,
                         ),
                         _buildWeatherDetail(
                           'Wind Speed',
-                          '${_weatherData!.windSpeed} km/h',
+                          '${wheatherService.weatherData!.windSpeed} km/h',
                           Icons.air,
                         ),
                       ],
@@ -200,7 +150,9 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
                 ),
               ),
             )
-          
+           
+          else if (wheatherService.error == null)
+            Icon(Icons.error),
         ],
       ),
     );
@@ -222,31 +174,30 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
 }
 
 class WeatherData {
-  final String city;
-  final double temperatureCelsius;
-  final String description;
-  final int humidity;
-  final double windSpeed;
-  final String icon;
+  final String? city;
+  final double? temperatureCelsius;
+  final String? description;
+  final int? humidity;
+  final double? windSpeed;
+  final String? icon;
 
   WeatherData({
-    required this.city,
-    required this.temperatureCelsius,
-    required this.description,
-    required this.humidity,
-    required this.windSpeed,
-    required this.icon,
+    this.city,
+    this.temperatureCelsius,
+    this.description,
+    this.humidity,
+    this.windSpeed,
+    this.icon,
   });
 
-  
   factory WeatherData.fromJson(Map<String, dynamic>? json) {
     return WeatherData(
       city: json!['city'],
       temperatureCelsius: json['temperature'].toDouble(),
       description: json['description'],
-      humidity: json['humidity'], 
-      windSpeed: json['windSpeed'].toDouble(), 
-      icon: json['icon'], 
+      humidity: json['humidity'],
+      windSpeed: json['windSpeed'].toDouble(),
+      icon: json['icon'],
     );
   }
 }
