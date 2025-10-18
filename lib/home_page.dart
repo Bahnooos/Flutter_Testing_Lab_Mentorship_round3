@@ -10,7 +10,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentIndex = 0;
 
@@ -67,17 +68,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.grey.shade50,
-              Colors.grey.shade100,
-            ],
+            colors: [Colors.grey.shade50, Colors.grey.shade100],
           ),
         ),
         child: Column(
           children: [
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 color: Colors.orange.shade100,
                 border: Border(
@@ -86,11 +84,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.warning,
-                    color: Colors.orange.shade700,
-                    size: 20,
-                  ),
+                  Icon(Icons.warning, color: Colors.orange.shade700, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -114,42 +108,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     child: widget,
                   );
                 }).toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.blue.shade50,
-          border: Border(
-            top: BorderSide(color: Colors.blue.shade200),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.info_outline, color: Colors.blue.shade700, size: 16),
-                const SizedBox(width: 8),
-                Text(
-                  'Find and fix the bugs in each widget!',
-                  style: TextStyle(
-                    color: Colors.blue.shade700,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Switch between tabs to test different widgets',
-              style: TextStyle(
-                color: Colors.blue.shade600,
-                fontSize: 12,
               ),
             ),
           ],
