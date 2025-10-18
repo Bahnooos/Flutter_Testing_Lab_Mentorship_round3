@@ -44,10 +44,10 @@ class _ShoppingCartState extends State<ShoppingCart> {
     setState(() {
       final index = _items.indexWhere((item) => item.id == id);
       if (index != -1) {
-        if (newQuantity <= 0) {
+        if (_items[index].quantity <= 0) {
           _items.removeAt(index);
         } else {
-          _items[index].quantity = newQuantity;
+          _items[index].quantity += newQuantity;
         }
       }
     });
@@ -70,13 +70,14 @@ class _ShoppingCartState extends State<ShoppingCart> {
   double get totalDiscount {
     double discount = 0;
     for (var item in _items) {
-      discount += item.discount * item.quantity;
+      discount += item.discount;
     }
     return discount;
   }
 
   double get totalAmount {
-    return subtotal + totalDiscount;
+    double totleDiscountforAllAmounts = subtotal * (totalDiscount);
+    return subtotal - totleDiscountforAllAmounts;
   }
 
   int get totalItems {
@@ -182,8 +183,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            onPressed: () =>
-                                updateQuantity(item.id, item.quantity - 1),
+                            onPressed: () => updateQuantity(item.id, -1),
                             icon: const Icon(Icons.remove),
                           ),
                           Container(
@@ -198,8 +198,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                             child: Text('${item.quantity}'),
                           ),
                           IconButton(
-                            onPressed: () =>
-                                updateQuantity(item.id, item.quantity + 1),
+                            onPressed: () => updateQuantity(item.id, 1),
                             icon: const Icon(Icons.add),
                           ),
                           IconButton(
